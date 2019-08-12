@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>js上传文件</title>
+    <script src="../jquery-3.3.1.min.js"></script>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+        }
+        /*按钮样式*/
+        .btn{
+            width:100px;
+            height: 40px;
+            text-align: center;
+            border-radius: 4px;
+            background-color: chocolate;
+            line-height: 40px;
+            cursor: pointer;
+            color: white;
+        }
+        /*按钮上传样式*/
+        .btn-upload{
+            background-color: crimson;
+        }
+
+        #operating{
+            padding: 20px;
+            margin-left: 50px;
+        }
+
+        input[type='file']{
+            display: none;
+        }
+
+        #previewlist{
+            width: 100%;
+            min-height: 500px;
+            margin-top: 20px;
+            border: 1px solid #aaa;
+        }
+
+        #previewlist .li{
+            float: left;
+            padding: 10px;
+            margin-left: 10px;
+            width: 300px;
+            height: 400px;
+            position: relative;
+        }
+
+        #previewlist .li img{
+            max-width: 300px;
+            max-height: 400px;
+            padding: 4px;
+            border: 1px solid green;
+        }
+
+        #previewlist .li img:hover{
+            background: #999;
+        }
+        /*删除按钮*/
+        #previewlist .li i{
+            font-style: normal;
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            line-height: 30px;
+            text-align: center;
+            top: 10px;
+            right: 0px;
+            background-color: rgba(0,0,0,0.5);
+            color: red;
+            border-radius: 5px;
+        }
+
+        #previewlist .li .tip{
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            top: 0;
+            left: 0px;
+            text-align: center;
+            color: red;
+            display: none;
+        }
+
+    </style>
+</head>
+<body>
+<div id="operating">
+    <input type="file" name="file" multiple />
+    <button class="btn btn-choose">选择图片</button>
+    <button class="btn btn-upload">上传</button>
+
+    <div id="previewlist">
+    </div>
+</div>
+    <script>
+        $(function(){
+            //自定义一个存储上传的文件对象数组
+            var uploadFiles=[];
+            var k=0;
+            //点击按钮，启动文件上传
+            $('.btn-choose').click(function(){
+                //点击按钮，启动文件上传
+                $('input[type=file]').click();
+            })
+
+            //上传框内容改变事件
+            $('input[type=file]').change(function(){
+                var filelist=this.files;
+                for (var i=0;i<filelist.length;i++){
+                    filelist[i].index=k;
+                    preview(filelist[i]);
+                    k++;
+                }
+            });
+            function preview(file){
+                    var reader=new FileReader();
+                    reader.onload=function(e){
+                        addPreview(e.target.result);
+                        uploadFiles.push(file);
+                    }
+                    reader.readAsDataURL(file);
+                }
+
+            //进行图片上传前展示
+            function addPreview(src){
+                var html = '<div class="li upload"><img src="' + src + '"><i>x</i><div class="tip">上传成功</div></div>';
+//                alert(html);
+                $("#previewlist").append(html);
+            }
+
+            //上传操作
+            $(".btn-upload").click(function(){
+//                console.log(uploadFiles);
+                if(uploadFiles.length<1){
+                    alert("您尚未选择文件");
+                    return;
+                }
+
+                var formData=new FormData();
+                for (var i=0;i<uploadFiles.length;i++){
+                    formData.append("file[]",uploadFiles[i])
+                }
+                $.ajax({
+                    url:"http://www.mouth6.com/index.php?c=upload&a=uploadinterfacetest",
+                    type:"post",
+                    data:formData,
+                    processData:false,
+                    contentType:false,
+                    success:function(data){
+                        data = JSON.parse(data);
+                        if(data.code ==1008){
+//                            alert("ok");
+                            //将上传成功的图片显示div
+                            var dt=data.data;
+                            dt.forEach(function(v,k){
+                                uploadFiles.forEach(function (vt,kt) {
+                                    if(vt.name== v.name){
+                                        var index=vt.index;
+                                        alert(index);
+                                        //得到元素里面的div
+                                        $("#previewlist").children('.li.upload').eq(index).addClass("uploaded").find(".tip").show();
+                                        uploadFiles.splice(index,1);
+                                        k--;
+                                    }
+                                });
+                            });
+                        }else{
+                            //失败显示失败
+
+                        }
+                    },
+                    error:function(err){
+                        alert("上传错误！");
+                    }
+                })
+            })
+
+            //鼠标划入显示删除按钮
+            $("#previewlist").on("mouseover",".li",function(){
+                $(this).find('i').show();
+            })
+            //鼠标划出隐藏删除按钮
+            $("#previewlist").on("mouseout",".li",function(){
+                $(this).find('i').hide();
+            })
+            //点击删除，删除图片
+            $("#previewlist").on("click",".li i",function(){
+                $(this).parent().remove();
+//                console.log(index);
+                uploadFiles.splice(index,1);
+                k--;
+            });
+        })
+    </script>
+</body>
+</html>

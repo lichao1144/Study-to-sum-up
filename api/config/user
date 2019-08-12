@@ -1,0 +1,7 @@
+[userToken]
+accessKey = leningEducation
+expire = 7200
+
+[Encrypt]
+key = lening
+iv = "alAqitimP9sfD5JA"

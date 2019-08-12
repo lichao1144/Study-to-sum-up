@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ajax</title>
+    <script src="../jquery-3.3.1.min.js"></script>
+    <style type="text/css">
+        #imgs{
+            margin-top:10px ;
+        }
+        #imgs img{
+            width: 300px;
+            height: 300px;
+            border:1px ;
+            border-radius: 6px;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+        <button>点我啊！</button>
+        <div id="div">
+        </div>
+        <form action="http://www.mouth6.com/index.php?c=upload&a=uploadinterfacetest" method="post" target="upload" id="myform">
+            <input type="file" name="file[]" multiple="multiple" accept="image/*">
+            <input type="text" name="name">
+            <button type="button">提交</button>
+        </form>
+        <!--<iframe src="" name="upload" style="display: none"></iframe>-->
+        <div id="imgs"></div>
+<script>
+    $(function(){
+        //上传前预览图片
+        var file=$('input[type="file"]');
+        var imgs=$("#imgs");
+        file.change(function(){
+//            console.log(this.value);
+            var fileList=this.files;
+            console.log(fileList);
+            for (var i=0;i<fileList.length;i++){
+                var reader=new FileReader();
+                reader.onload=function(evt){
+                    var src=evt.target.result;
+                    imgs.append("<img src='"+src+" '>");
+                }
+                reader.readAsDataURL(this.files[i]);
+            }
+        })
+
+        $('button').click(function(){
+            //ajax资源共享
+//            $.ajax({
+//                //jquery带的token
+////                beforeSend: function (xhr) {
+////                        xhr.setRequestHeader("x-apr-token","1810b");
+////                },
+//                url:"http://www.mouth61.com/index.php?c=text&a=index",
+//                method:'get',
+//                data:{},
+//                async:true,
+//                dataType:'',
+//                success:function(res){
+//                    console.log(res);
+//                },
+//                error: function (error) {
+//                    console.log(error);
+//                },
+////                complete: function () {
+////                    alert("请求完毕");
+////                }
+//            })
+            //JSON.stringify将json对象编码成json字符串
+//            var data={
+//                "name":"lichao",
+//                "sex":"女"
+//            };
+//            console.log(data);
+//            //变成字符串
+//            console.log(JSON.stringify(data));
+//            var data="<students count='2'><student><name>lichao</name><age>18</age></student><student><name>lisi</name><age>19</age></student></students>";
+//            var dom=new DOMParser();
+//            var xmldom=dom.parseFromString(data,"text/xml");
+////            console.log(xmldom);
+//            var students=xmldom.getElementsByTagName('student');
+//            console.log(students);
+//            for(var i=0;i<students.length;i++){
+//                var student=students[i];
+//            }
+//            console.log("学生的姓名为",student.getElementsByTagName('name')[0].childNodes[0].nodeValue);
+            //进行jsonp操作
+            $.getJSON("http://www.mouth6.com/index.php?c=front&a=js&jsoncallback=?",function(data){
+                    console.log(data);
+            });
+            var imgs=$("#imgs");
+            //图片上传
+//            var file=$("input[type=file]")[0].files[0];
+//            console.log(file);
+            var myform=$("#myform")[0];
+            //创建formdata对象
+            var formData = new FormData(myform);
+            //formData.append('file',file);
+            formData.append('file[]',file[0].files);
+            console.log(formData);
+            $.ajax({
+                url:"http://www.mouth6.com/index.php?c=upload&a=uploadinterfacetest",
+                type:'post',
+                data: formData,
+                contentType: false, // 告诉ajax不要设置默认的Content-Type这个header头
+                processData:false,// 告诉ajax不要将数据处理成&连接字符串
+                async:true,
+                success:function(data){
+                    data=JSON.parse(data);
+                    console.log(data);
+                    imgs.append("<img src='"+data.data.savePath+'/'+data.data.filename+" '>");
+                },
+                error: function (error) {
+                    console.log(error)
+                }
+            })
+        })
+    })
+    //原生操作
+//    function add(data){
+//        //将data转换成json对象
+//        data=JSON.parse(data);
+////        console.log(data);
+//        $('#imgs').html(data);
+//        var obj=document.querySelector("#imgs");
+//        var img=document.createElement('img');
+//        img.src=data.savePath+"/"+data.filename;
+//        img.width=100;
+//        img.height=100;
+//        obj.appendChild(img);
+//    }
+//    function demo(data){
+//        $('#div').html(data);
+//    }
+</script>
+<!--<script src="http://www.mouth6.com/index.php?c=front&a=js&callback=demo"></script>-->
+</body>
+</html>

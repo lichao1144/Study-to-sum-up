@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>切片上传</title>
+    <script src="../jquery-3.3.1.min.js"></script>
+</head>
+<body>
+    <input type="file" name="file" id="file">
+    <input type="button" value="上传" id="upload">
+<script>
+    $(function(){
+        var file=$("#file");//上传框
+        var upload=$("#upload");//上传按钮
+        var fileSize=1024*1024;//文件每块的大小
+        var chunkNum='';//能分多少块
+        var start=0;//开始位置
+        var end=0;//结束位置
+        //上传按钮
+        upload.click(function(){
+            //获取到文件信息
+            var fileInfo=file[0].files[0];
+//            console.log(fileInfo);
+            //进行无文件上传验证
+            if(file[0].files.length<1){
+                alert("请选择上传文件");
+                return;
+            }
+            chunkNum=Math.ceil(fileInfo.size/fileSize);
+//            console.log(chunkNum);
+            for(var i=0;i<chunkNum;i++){
+                start=i*fileSize;
+                // console.log(start);
+                end=start+fileSize;
+                // console.log(end);
+                if(end>fileInfo.size){
+                    end=fileInfo.size;
+                }
+                end=start+fileSize;
+//                console.log(end);
+                var formData=new FormData();
+                var fileslice=fileInfo.slice(start,end);
+                console.log(fileslice);
+                formData.append('file',fileslice);//分段的部分
+                formData.append('totalnum',chunkNum);//总块数
+                formData.append('everynum',i)//每次的块数
+                formData.append('filename',fileInfo.name);//文件名称
+                formData.append('filesize',fileInfo.size);//文件大小
+//            console.log(formData);
+                $.ajax({
+                    url:"http://www.mouth6.com/index.php?c=front&a=sliceuploadtext",
+                    method:"post",
+                    data:formData,
+                    dataType:'json',
+                    contentType: false, // 告诉ajax不要设置默认的Content-Type这个header头
+                    processData:false,// 告诉ajax不要将数据处理成&连接字符串
+                    success:function(data){
+                        if(data.code==200){
+                            alert("上传成功");
+                        }
+                    }
+                })
+            }
+        });
+    })
+</script>
+</body>
+</html>

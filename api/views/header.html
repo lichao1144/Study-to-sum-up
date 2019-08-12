@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ajax发送header头</title>
+    <script src="../jquery-3.3.1.min.js"></script>
+</head>
+<body>
+    <script>
+        $.ajax({
+            beforeSend: function(xhr){
+                xhr.setRequestHeader("Authorization","eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOlsiYXVkaWVuY2VfMSIsImF1ZGllbmNlXzIiXSwiZXhwIjoxNTYxMDgzNDY5LCJpYXQiOjE1NjEwNzYyNjksImlzcyI6ImxpY2hhbyIsImp0aSI6IjEiLCJuYmYiOjE1NjEwNzYyNjksInN1YiI6Imh0dHA6XC9cL3d3dy5tb3V0aDYuY29tIiwiY2xhaW1fbmFtZSI6IjEiLCJpZCI6ImlkIn0.m9DCQUpGoO4MEMb7qeJEtlnXXL9rn-LDOkexvTX3aac");
+//                xhr.setRequestHeader("x-api-token","123456");
+            },
+//            header:{
+//                Authorization:"Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOlsiYXVkaWVuY2VfMSIsImF1ZGllbmNlXzIiXSwiZXhwIjoxNTYxMDgzNDY5LCJpYXQiOjE1NjEwNzYyNjksImlzcyI6ImxpY2hhbyIsImp0aSI6IjEiLCJuYmYiOjE1NjEwNzYyNjksInN1YiI6Imh0dHA6XC9cL3d3dy5tb3V0aDYuY29tIiwiY2xhaW1fbmFtZSI6IjEiLCJpZCI6ImlkIn0.m9DCQUpGoO4MEMb7qeJEtlnXXL9rn-LDOkexvTX3aac"
+//            },
+            url: "http://www.mouth6.com/index.php?c=index&a=display",
+            type: "post",
+            data: {"randnumber":"GsrN29hvzTDB6wEzlVpj","timestamp":"1561030124","sign":"49b5bb601079478007d857501ee8df36eae1339e"},
+            async: true,
+            success: function(data){
+                console.log(data);
+            },
+            error: function(err){
+                console.log(err);
+            }
+        });
+    </script>
+</body>
+</html>
